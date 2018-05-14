@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+    <title>Mes</title>
+</head>
+
+<body>
+    <div id="app_tabs">
+        <div class="head_tab">
+            <a href="javascript:void(0)" v-for="(tab, index) in tabs" v-bind:class="{ active : index == active_tab }" v-on:click="active_tab = index">{{ tab }}</a>
+        </div>
+        <div class="cont_tab">
+            <div v-for="(tab, index) in tabs" v-if="index == active_tab" v-bind:class="{ active : index == active_tab }">content {{ tab }}</div>
+        </div>
+    </div>
+    <!-- script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+    <script>
+        var app_tabs = new Vue({
+            el: '#app_tabs',
+            data: {
+                tabs: ['Xã hội', 'Công nghệ', 'Giáo dục'],
+                active_tab: 0
+            }
+        });
+    </script>
+</body>
+</html>

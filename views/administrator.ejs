@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+    <link rel='stylesheet' href='/css/master.css'>
+    <title>Messages</title>
+</head>
+
+<body>
+    <div id="app_messages">
+        <ul>
+            <li v-for="guest in guests">{{ guest.name }} - {{ guest.id }} {{ guest.messages }}<br>
+                <p v-for="item in guests.messages"> {{ item }}</p>
+            </li>
+        </ul>
+    </div>
+    <!-- script -->
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script> var socket = io('http://127.0.0.1:3000'); </script>
+    <script>
+        var app_messages = new Vue({
+            el: '#app_messages',
+            data: {
+                message: '',
+                messages: [],
+                guests: []
+            },
+            methods: {
+                scroll_to_end() {
+                    // (document.querySelector(".wrap_messages")).scrollTop = (document.querySelector(".wrap_messages")).scrollHeight;
+                },
+                send_message() {
+                }
+            },
+            mounted() {
+                this.scroll_to_end();
+            },
+            updated() {
+                this.scroll_to_end();
+            }
+        });
+
+        socket.on('server_list_guest', (arr_guest) => {
+            if (arr_guest) {
+                app_messages.guests = arr_guest;
+            }
+        });
+
+        socket.on('server_send_guest_messages', (arr_guest) => {
+            if (arr_guest) {
+                app_messages.guests = arr_guest;
+            }
+        });
+    </script>
+</body>
+
+</html>

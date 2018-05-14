@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+    <link rel='stylesheet' href='/css/master.css'>
+    <title>Mes</title>
+</head>
+
+<body>
+    <div id="app_messages">
+        <h1>ID: {{ my_socket }}</h1>
+        <div class="head_tab">
+            <a href="javascript:void(0)" v-for="(user, index) in users" v-bind:class="{ active : index == active_tab }" v-on:click="create_room(user, index)">{{ user }}</a>
+        </div>
+        <div class="cont_tab">
+            <div id="wrap_messages" v-for="(user, index) in users" v-if="index == active_tab" v-bind:class="{ active : index == active_tab }">
+                <h1>
+                    Chat with : {{ user }}
+                    <br> Room : {{ room_chat }}
+                </h1>
+                <div class="message_box">
+                    <p v-for="mes in messages">{{ mes }}</p>
+                </div>
+                <input type="text" v-model="message" v-on:keyup.enter="send_message">
+                <button v-on:click="send_message">send</button>
+            </div>
+        </div>
+    </div>
+    <!-- script -->
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/socket.io.js"></script>
+    <script> var socket = io('http://127.0.0.1:3000'); </script>
+    <script>
+        var app_messages = new Vue({
+            el: '#app_messages',
+            data: {
+                my_socket: '',
+                message: '',
+                messages: [],
+                users: [],
+                active_tab: 0,
+                room_chat: ''
+            },
+            methods: {
+                scroll_to_end() {
+                    var ele = document.querySelector('.message_box'); ele.scrollTop = ele.scrollHeight;
+                },
+                send_message() {
+                    if (this.message) {
+                        socket.emit('user_send_mes', this.message); this.message = '';
+                    }
+                },
+                create_room(user, index) {
+                    this.active_tab = index;
+                    var socket_id_remote = user; // id socket của người cần chat, nối các socket id để đặt tên room
+                    socket.emit('user_room_name', socket_id_remote);
+                }
+            },
+            mounted() { this.scroll_to_end(); },
+            updated() { this.scroll_to_end(); }
+        });
+        socket.on('server_users', (users) => {
+            users.splice(users.indexOf(app_messages.my_socket), 1); // không chat vs chính mình
+            app_messages.users = users;
+        });
+        socket.on('my_socket', (my_socket) => {
+            app_messages.my_socket = my_socket;
+        });
+        socket.on('server_send_mes', (message, room_chat) => {
+            app_messages.messages.push(message);
+            app_messages.room_chat = room_chat;
+        });
+    </script>
+</body>
+
+</html>
